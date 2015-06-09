@@ -28,7 +28,9 @@ main(!IO) :-
 
 rot13(CharIn) =
 	(
-		if rot13_2(CharIn, ForwardChar)
+		if is_upper(CharIn)
+		then to_upper(rot13(to_lower(CharIn)))
+		else if rot13_2(CharIn, ForwardChar)
 		then ForwardChar
 		else if rot13_2(BackwardChar, CharIn)
 		then BackwardChar
@@ -52,17 +54,3 @@ rot13_2('j', 'w').
 rot13_2('k', 'x').
 rot13_2('l', 'y').
 rot13_2('m', 'z').
-
-rot13_2('A', 'N').
-rot13_2('B', 'O').
-rot13_2('C', 'P').
-rot13_2('D', 'Q').
-rot13_2('E', 'R').
-rot13_2('F', 'S').
-rot13_2('G', 'T').
-rot13_2('H', 'U').
-rot13_2('I', 'V').
-rot13_2('J', 'W').
-rot13_2('K', 'X').
-rot13_2('L', 'Y').
-rot13_2('M', 'Z').
