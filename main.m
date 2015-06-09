@@ -17,15 +17,19 @@ main(!IO) :-
 :- pred processFiles(list(string)::in, io::di, io::uo) is det.
 
 processFiles([], !IO) :- true.
-processFiles([X | Xs], !IO) :-
-	io.open_input(X, Resource, !IO),
+processFiles([File | Files], !IO) :-
+	io.format("======== %s ========\n", [s(File)], !IO),
+
+	io.open_input(File, Resource, !IO),
 	guard_res(Resource, Stream),
 
 	io.input_stream_foldl_io(Stream, io.write_char, Result, !IO),
 	guard_res(Result),
 
 	io.close_input(Stream, !IO),
-	processFiles(Xs, !IO).
+	io.nl(!IO),
+
+	processFiles(Files, !IO).
 
 :- pred guard_res(io.res(T)::in, T::out) is det.
 
