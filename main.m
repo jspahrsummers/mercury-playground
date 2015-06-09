@@ -29,8 +29,19 @@ main(!IO) :-
 rot13(CharIn) =
 	(
 		if is_upper(CharIn)
-		then to_upper(rot13(to_lower(CharIn)))
-		else if rot13_2(CharIn, ForwardChar)
+		then rot13_upper(CharIn)
+		else rot13_lower(CharIn)
+	).
+
+:- func rot13_upper(char) = char.
+
+rot13_upper(CharIn) = to_upper(rot13_lower(to_lower(CharIn))).
+
+:- func rot13_lower(char) = char.
+
+rot13_lower(CharIn) =
+	(
+		if rot13_2(CharIn, ForwardChar)
 		then ForwardChar
 		else if rot13_2(BackwardChar, CharIn)
 		then BackwardChar
