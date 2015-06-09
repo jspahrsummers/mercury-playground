@@ -6,6 +6,7 @@
 :- pred main(io::di, io::uo) is det.
 
 :- implementation.
+:- import_module exception.
 :- import_module list.
 :- import_module string.
 
@@ -18,21 +19,30 @@ main(!IO) :-
 processFiles([], !IO) :- true.
 processFiles([X | Xs], !IO) :-
 	io.open_input(X, Resource, !IO),
+	guard_res(Resource, Stream),
+
+	io.input_stream_foldl_io(Stream, io.write_char, Result, !IO),
+	guard_res(Result),
+
+	io.close_input(Stream, !IO),
+	processFiles(Xs, !IO).
+
+:- pred guard_res(io.res(T)::in, T::out) is det.
+
+guard_res(Result, Value) :-
 	(
-		Resource = io.ok(Stream),
-		io.input_stream_foldl_io(Stream, io.write_char, Result, !IO),
-		(
-			if Result = io.error(ErrorCode)
-			then logError(ErrorCode, !IO)
-			else processFiles(Xs, !IO)
-		),
-		io.close_input(Stream, !IO)
+		Result = io.ok(Value)
 	;
-		Resource = io.error(ErrorCode),
-		logError(ErrorCode, !IO)
+		Result = io.error(ErrorCode),
+		throw(ErrorCode)
 	).
 
-:- pred logError(error::in, io::di, io::uo) is det.
+:- pred guard_res(io.res::in) is det.
 
-logError(ErrorCode, !IO) :-
-	io.format("%s\n", [s(io.error_message(ErrorCode))], !IO).
+guard_res(Result) :-
+	(
+		Result = io.ok
+	;
+		Result = io.error(ErrorCode),
+		throw(ErrorCode)
+	).
